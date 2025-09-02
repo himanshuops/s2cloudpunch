@@ -1,4 +1,3 @@
-// Detect environment: local (localhost) or production (custom domain)
 let BACKEND_URL;
 
 if (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")) {
@@ -7,7 +6,6 @@ if (window.location.hostname.includes("localhost") || window.location.hostname.i
   BACKEND_URL = "https://api.s2cloudpunch.in";  // backend deployed on Render
 }
 
-// short helper — locate your form
 const form = document.querySelector('section .ragister form') || document.querySelector('form');
 
 form.addEventListener('submit', async (e) => {

@@ -7,16 +7,17 @@ const Contact = require('./models/Contact');
 const app = express();
 app.use(express.json());
 
-// --- Allowed origins (local + deployed frontend) ---
+// --- Allowed origins ---
 const allowedOrigins = [
-  'http://localhost:5500',      // if you test frontend with VSCode Live Server
-  'http://127.0.0.1:5500',      // alt local URL
-  'http://localhost:3000',      // if frontend runs with React dev server
-  'https://h.s2cloudpunch.in',  // production frontend
+  process.env.FRONTEND_URL,     // from .env (changes between local and Render)
+  'http://localhost:5500',      // fallback for local
+  'http://127.0.0.1:5500',      // fallback
+  'http://localhost:3000',      // if testing directly
+  'https://h.s2cloudpunch.in',  // deployed frontend
   'https://s2cloudpunch.in'     // root domain (optional)
 ];
 
-// CORS middleware
+// CORS setup
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -34,11 +35,12 @@ if (!MONGO) {
   console.error('❌ Missing MONGO_URI in .env');
   process.exit(1);
 }
+
 mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => { console.error('❌ MongoDB connect error', err); process.exit(1); });
 
-// --- API routes ---
+// --- Routes ---
 app.get('/api/health', (req, res) => res.json({ ok: true, env: process.env.NODE_ENV || 'dev' }));
 
 app.post('/api/contact', async (req, res) => {
@@ -59,7 +61,7 @@ app.get('/api/contacts', async (req, res) => {
   res.json(list);
 });
 
-// 404 for unknown routes
+// 404 handler
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
 // --- Start server ---
